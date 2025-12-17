@@ -1,11 +1,11 @@
-import { useCart } from "./contexts/CartContext";
-import { CartProvider } from "./contexts/CartContext";
+import { CartProvider, useCart } from "./contexts/CartContext";
 import type { ReactNode } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  Link,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Home from "./pages/Home";
@@ -14,8 +14,11 @@ import Register from "./pages/Register";
 import "./App.css";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
+import Admin from "./pages/Admin";
 
-// Navbar Component
+/* =======================
+   NAVBAR
+======================= */
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const { getTotalItems } = useCart();
@@ -23,28 +26,47 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <a href="/" className="nav-logo">🍬 Sweet Shop</a>
-        
+        <Link to="/" className="nav-logo">
+          🍬 Sweet Shop
+        </Link>
+
         <div className="nav-links">
           {isAuthenticated && (
             <>
-              <a href="/orders" className="nav-link">My Orders</a>
-              <a href="/cart" className="cart-link">
+              <Link to="/orders" className="nav-link">
+                My Orders
+              </Link>
+              <Link to="/cart" className="cart-link">
                 🛒 Cart ({getTotalItems()})
-              </a>
+              </Link>
             </>
           )}
-          
+
           {isAuthenticated ? (
             <>
               <span className="nav-user">Welcome, {user?.name}!</span>
-              {user?.role === 'ADMIN' && <span className="admin-badge">ADMIN</span>}
-              <button onClick={logout} className="nav-button">Logout</button>
+
+              {user?.role === "ADMIN" && (
+                <>
+                  <Link to="/admin" className="nav-link">
+                    Admin Dashboard
+                  </Link>
+                  <span className="admin-badge">ADMIN</span>
+                </>
+              )}
+
+              <button onClick={logout} className="nav-button">
+                Logout
+              </button>
             </>
           ) : (
             <>
-              <a href="/login" className="nav-link">Login</a>
-              <a href="/register" className="nav-link">Register</a>
+              <Link to="/login" className="nav-link">
+                Login
+              </Link>
+              <Link to="/register" className="nav-link">
+                Register
+              </Link>
             </>
           )}
         </div>
@@ -53,13 +75,32 @@ const Navbar = () => {
   );
 };
 
-// Protected Route Component
+/* =======================
+   PROTECTED ROUTES
+======================= */
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
-// Main App Component
+const AdminRoute = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+
+  if (!isAuthenticated) return <Navigate to="/login" />;
+
+  if (user?.role !== "ADMIN") return <Navigate to="/" />;
+
+  return <>{children}</>;
+};
+
+/* =======================
+   APP CONTENT
+======================= */
 const AppContent = () => {
   return (
     <div className="app">
@@ -69,6 +110,7 @@ const AppContent = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
           <Route
             path="/cart"
             element={
@@ -77,6 +119,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/orders"
             element={
@@ -85,6 +128,16 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
@@ -92,7 +145,10 @@ const AppContent = () => {
   );
 };
 
-function App() {
+/* =======================
+   ROOT
+======================= */
+export default function App() {
   return (
     <Router>
       <AuthProvider>
@@ -103,5 +159,3 @@ function App() {
     </Router>
   );
 }
-
-export default App;

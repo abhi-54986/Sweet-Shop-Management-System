@@ -21,6 +21,14 @@ const Orders = () => {
     }
   };
 
+  const getSweetName = (sweet: any) => {
+    if (!sweet) return "Unknown Sweet";
+    if (typeof sweet === "object" && sweet.name) {
+      return sweet.name;
+    }
+    return "Sweet";
+  };
+
   if (loading) {
     return <div className="container">Loading orders...</div>;
   }
@@ -37,7 +45,6 @@ const Orders = () => {
   return (
     <div className="container">
       <h1>My Orders</h1>
-
       <div className="orders-list">
         {orders.map((order) => (
           <div key={order._id} className="order-card">
@@ -61,7 +68,7 @@ const Orders = () => {
               {order.items.map((item, index) => (
                 <div key={index} className="order-item">
                   <span>
-                    {typeof item.sweet === 'object' ? item.sweet.name : 'Sweet'} × {item.quantity}
+                    {getSweetName(item.sweet)} × {item.quantity}
                   </span>
                   <span>₹{item.price * item.quantity}</span>
                 </div>
@@ -72,7 +79,7 @@ const Orders = () => {
               <div className="order-address">
                 <strong>Delivery Address:</strong>
                 <p>
-                  {order.deliveryAddress.street}, {order.deliveryAddress.city},
+                  {order.deliveryAddress.street}, {order.deliveryAddress.city},{' '}
                   {order.deliveryAddress.state} - {order.deliveryAddress.zipCode}
                 </p>
                 <p>Phone: {order.deliveryAddress.phone}</p>
