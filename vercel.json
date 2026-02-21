@@ -1,16 +1,15 @@
 {
-  "installCommand": "npm install --omit=dev --prefix backend; npm install --prefix frontend",
+  "installCommand": "npm install --prefix backend && npm install --prefix frontend",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@5.3.26"
+      "memory": 1024,
+      "maxDuration": 10
     }
   },
   "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
