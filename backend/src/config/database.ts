@@ -1,16 +1,38 @@
 import mongoose from 'mongoose';
 
+let isConnected = false;
+let connectPromise: Promise<void> | null = null;
+
 const connectDB = async (): Promise<void> => {
+  if (isConnected || mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  if (connectPromise) {
+    return connectPromise;
+  }
+
+  const mongoURI = process.env.MONGODB_URI;
+  if (!mongoURI) {
+    throw new Error('MONGODB_URI is not set');
+  }
+
+  connectPromise = (async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/sweet-shop';
-    
     await mongoose.connect(mongoURI);
+    isConnected = true;
     
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error);
-    process.exit(1);
+    isConnected = false;
+    throw error;
+  } finally {
+    connectPromise = null;
   }
+  })();
+
+  return connectPromise;
 };
 
 // Handle connection events
