@@ -19,6 +19,10 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/sweets', sweetRoutes);
