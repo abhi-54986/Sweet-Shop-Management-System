@@ -1,11 +1,10 @@
 {
-  "installCommand": "npm install --prefix backend; npm install --prefix frontend",
+  "installCommand": "npm install --omit=dev --prefix backend; npm install --prefix frontend",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@5.3.26",
-      "includeFiles": "backend/**"
+      "runtime": "@vercel/node@5.3.26"
     }
   },
   "rewrites": [
