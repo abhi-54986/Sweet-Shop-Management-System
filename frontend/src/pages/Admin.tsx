@@ -18,8 +18,6 @@ const Admin = () => {
     stock: 0,
     imageUrl: "",
   });
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
 
   useEffect(() => {
     if (activeTab === "orders") {
@@ -78,8 +76,6 @@ const Admin = () => {
         stock: 0,
         imageUrl: "",
       });
-      setSelectedImage(null);
-      setImagePreview("");
       loadSweets();
     } catch (error) {
       console.error("Error adding sweet:", error);
@@ -96,20 +92,6 @@ const Admin = () => {
       loadSweets();
     } catch (error) {
       alert("Failed to delete sweet");
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
